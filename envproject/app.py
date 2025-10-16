@@ -168,6 +168,7 @@ def show_passport():
             else:
                 st.write("미획득")
 
+# --- 사이드바 메뉴 구성 (초기화 버튼 로직 수정) ---
 with st.sidebar:
     st.header("메뉴")
     if st.button("메인 화면"):
@@ -177,7 +178,6 @@ with st.sidebar:
         st.session_state.page = 'passport'
         st.rerun()
     st.markdown("---")
-    # '탐험 초기화' 버튼 로직 수정
     if st.button("탐험 초기화"):
         initialize_state()
         st.rerun()
