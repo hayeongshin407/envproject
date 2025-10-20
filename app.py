@@ -20,7 +20,7 @@ MISSIONS_DATA = {
         'quiz_question': '열대 기후에 대한 설명으로 틀린 것은 무엇일까요?',
         'quiz_options': ['일 년 내내 날씨가 덥다.', '피라냐, 나일악어 같은 동물이 산다.', '춥고 건조해서 눈이 많이 내린다.'],
         'quiz_answer': '춥고 건조해서 눈이 많이 내린다.',
-        'mission_image': 'images/tropical_mission.jpg', # 이미지 파일 이름 확인 필요
+        'mission_image': 'images/tropical_mission.jpg',
         'mission_target': '피라냐'
     },
     '사막': {
@@ -36,7 +36,7 @@ MISSIONS_DATA = {
         'quiz_question': '사막 기후의 특징으로 틀린 것은?',
         'quiz_options': ['비가 거의 오지 않는다', '선인장이 산다', '일 년 내내 비가 많이 온다'],
         'quiz_answer': '일 년 내내 비가 많이 온다',
-        'mission_image': 'images/desert_mission.jpg', # 이미지 파일 이름 확인 필요
+        'mission_image': 'images/desert_mission.jpg',
         'mission_target': '아가베'
     },
     '지중해': {
@@ -52,7 +52,7 @@ MISSIONS_DATA = {
         'quiz_question': '지중해 기후에서 잘 자라는 식물이 아닌 것은?',
         'quiz_options': ['올리브나무', '포도나무', '야자수'],
         'quiz_answer': '야자수',
-        'mission_image': 'images/mediterranean_mission.jpg', # 이미지 파일 이름 확인 필요
+        'mission_image': 'images/mediterranean_mission.jpg',
         'mission_target': '올리브나무'
     },
     '온대': {
@@ -68,7 +68,7 @@ MISSIONS_DATA = {
         'quiz_question': '온대 기후의 가장 큰 특징은 무엇일까요?',
         'quiz_options': ['사계절이 뚜렷하다', '항상 덥다', '얼음으로 덮여 있다'],
         'quiz_answer': '사계절이 뚜렷하다',
-        'mission_image': 'images/dolhareubang.jpg', # 온대관 미션 이미지
+        'mission_image': 'images/dolhareubang.jpg',
         'mission_target': '돌하르방'
     },
     '극지': {
@@ -84,7 +84,7 @@ MISSIONS_DATA = {
         'quiz_question': '극지방에 사는 동물이 아닌 것은?',
         'quiz_options': ['펭귄', '북극곰', '코알라'],
         'quiz_answer': '코알라',
-        'mission_image': 'images/polar_mission.jpg', # 이미지 파일 이름 확인 필요
+        'mission_image': 'images/polar_mission.jpg',
         'mission_target': '반달가슴곰'
     }
 }
@@ -217,69 +217,47 @@ if current_page == 'home':
 elif current_page == 'passport':
     show_passport()
 
-# ############ 이 부분이 수정되었습니다! (info_, quiz_ 조건 삭제) ############
-elif current_page.startswith('info_'):
-    zone_name = current_page.split('_')[1]
-    # 이제 '온대'도 info 페이지를 보여줍니다.
-    show_info_page(zone_name)
-
-elif current_page.startswith('quiz_'):
-    zone_name = current_page.split('_')[1]
-    # 이제 '온대'도 quiz 페이지를 보여줍니다.
-    show_quiz_page(zone_name)
-# ####################################################################
-    
-elif current_page.startswith('mission_'):
-    zone_name = current_page.split('_')[1]
-
-    # 히든 미션은 퀴즈 통과 여부와 관계없이 바로 실행
-    if zone_name == '히든':
-        st.title("⭐ 히든 미션 ⭐")
-        st.info("온대관에 숨겨진 '돌하르방'을 다시 찾아 사진을 찍어 저장한 후, 아래 버튼으로 올려주세요!")
-        st.image("images/dolhareubang.jpg") 
-        
-        uploaded_file = st.file_uploader("히든 미션 사진 파일 올리기", type=['jpg', 'jpeg', 'png'])
-        
+# ############ 이 부분이 수정되었습니다! (페이지 이동 로직 순서 변경) ############
+# 구체적인 페이지(온대, 히든, 최종)를 먼저 확인합니다.
+elif current_page == 'mission_온대':
+    if st.session_state.quiz_passed.get('온대', False):
+        st.title("🍂 온대관 사진 미션")
+        st.info("아래 사진 속 '돌하르방'을 찾아서 똑같이 사진을 찍어 저장한 후, 아래 버튼으로 올려주세요!")
+        st.image(MISSIONS_DATA['온대']['mission_image'])
+        uploaded_file = st.file_uploader("돌하르방 사진 파일 올리기", type=['jpg', 'jpeg', 'png'])
         if uploaded_file is not None:
-            st.success("히든 미션 사진 확인! 아래 사진을 선생님께 보여주세요.")
+            st.success("사진이 잘 올라왔어요! 아래 사진을 선생님께 보여주세요.")
             st.image(uploaded_file)
-
-            if st.button("선생님께 최종 확인받았어요!", type="primary"):
-                st.session_state.stamps['히든'] = True
-                st.success("히든 미션 성공! 당신을 진정한 생태 탐험가로 임명합니다!")
+            if st.button("선생님께 확인받았어요!", type="primary"):
+                st.session_state.stamps['온대'] = True
+                st.success("미션 성공! 온대관 도장을 획득했습니다.")
                 st.balloons()
-                time.sleep(3)
-                st.session_state.page = 'final_end'
+                time.sleep(2)
+                st.session_state.page = 'home'
                 st.rerun()
-                
-    # 일반 미션들은 퀴즈 통과 여부 확인
-    elif st.session_state.quiz_passed.get(zone_name, False):
-        if zone_name == '온대':
-            st.title("🍂 온대관 사진 미션")
-            st.info("아래 사진 속 '돌하르방'을 찾아서 똑같이 사진을 찍어 저장한 후, 아래 버튼으로 올려주세요!")
-            st.image(MISSIONS_DATA['온대']['mission_image'])
-            uploaded_file = st.file_uploader("돌하르방 사진 파일 올리기", type=['jpg', 'jpeg', 'png'])
-            if uploaded_file is not None:
-                st.success("사진이 잘 올라왔어요! 아래 사진을 선생님께 보여주세요.")
-                st.image(uploaded_file)
-                if st.button("선생님께 확인받았어요!", type="primary"):
-                    st.session_state.stamps['온대'] = True
-                    st.success("미션 성공! 온대관 도장을 획득했습니다.")
-                    st.balloons()
-                    time.sleep(2)
-                    st.session_state.page = 'home'
-                    st.rerun()
-        # 온대, 히든이 아닌 다른 관들
-        elif zone_name in MISSIONS_DATA:
-            mission_info = MISSIONS_DATA[zone_name]
-            mission_page_default(zone_name=zone_name, 
-                                 target_name=mission_info['mission_target'], 
-                                 image_path=mission_info['mission_image'])
-    # 퀴즈를 통과하지 못한 경우
     else:
         st.warning("퀴즈를 먼저 통과해야 미션을 수행할 수 있어요!")
         if st.button("퀴즈 풀러 가기"):
-            st.session_state.page = f'quiz_{zone_name}'
+            st.session_state.page = 'quiz_온대'
+            st.rerun()
+
+elif current_page == 'mission_hidden':
+    st.title("⭐ 히든 미션 ⭐")
+    st.info("사진 속 코알라를 찾아 인증샷을 찍어주세요!")
+    st.image("images/koala.jpg")
+    
+    uploaded_file = st.file_uploader("히든 미션 사진 파일 올리기", type=['jpg', 'jpeg', 'png'])
+    
+    if uploaded_file is not None:
+        st.success("히든 미션 사진 확인! 아래 사진을 선생님께 보여주세요.")
+        st.image(uploaded_file)
+
+        if st.button("선생님께 최종 확인받았어요!", type="primary"):
+            st.session_state.stamps['히든'] = True
+            st.success("히든 미션 성공! 당신을 진정한 생태 탐험가로 임명합니다!")
+            st.balloons()
+            time.sleep(3)
+            st.session_state.page = 'final_end'
             st.rerun()
 
 elif current_page == 'final_end':
@@ -287,3 +265,30 @@ elif current_page == 'final_end':
     st.header("모든 미션과 히든 미션까지 완벽하게 해결했습니다!")
     st.write("오늘의 즐거운 탐험을 기억하며, 앞으로도 우리 지구를 사랑하는 멋진 사람이 되어주세요!")
     st.balloons()
+
+# 일반적인 페이지(info_, quiz_, mission_)를 나중에 확인합니다.
+elif current_page.startswith('info_'):
+    zone_name = current_page.split('_')[1]
+    show_info_page(zone_name)
+
+elif current_page.startswith('quiz_'):
+    zone_name = current_page.split('_')[1]
+    show_quiz_page(zone_name)
+    
+elif current_page.startswith('mission_'):
+    zone_name = current_page.split('_')[1]
+    
+    # '온대'와 '히든'은 위에서 이미 처리했으므로, 여기서는 그 외의 미션들만 처리
+    if zone_name != '온대' and zone_name != '히든':
+        if st.session_state.quiz_passed.get(zone_name, False):
+            if zone_name in MISSIONS_DATA:
+                mission_info = MISSIONS_DATA[zone_name]
+                mission_page_default(zone_name=zone_name, 
+                                     target_name=mission_info['mission_target'], 
+                                     image_path=mission_info['mission_image'])
+        else:
+            st.warning("퀴즈를 먼저 통과해야 미션을 수행할 수 있어요!")
+            if st.button("퀴즈 풀러 가기"):
+                st.session_state.page = f'quiz_{zone_name}'
+                st.rerun()
+# ####################################################################
